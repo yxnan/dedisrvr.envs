@@ -1,0 +1,3 @@
+#!/bin/bash
+
+screen -dm -S watch iwatch -e close_write -c "~/process-file %f" /var/ftp/dedisrvr_upload

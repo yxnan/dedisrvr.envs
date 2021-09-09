@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# plugin command 'resetonempty'
+screen -S l4d2 -X stuff "reset_if_empty^M"
+screen -S s2 -X stuff "reset_if_empty^M"
+screen -S e3 -X stuff "reset_if_empty^M"

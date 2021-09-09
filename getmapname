@@ -1,0 +1,14 @@
+#!/usr/bin/python3
+
+import re
+import sys
+
+s = open(input(), errors='ignore').read()
+s = re.sub('//.*\n', '', s)
+s = s[s.lower().index('"mission"'):]
+s = s[s.lower().index('"name"')+6:]
+a = s.index('"') + 1
+b = s.index('"', a)
+
+print(s[a:b])
+

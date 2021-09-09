@@ -1,0 +1,15 @@
+#!/usr/bin/python3
+
+import re
+import sys
+
+s = open(input(), errors='ignore').read().lower()
+s = re.sub('//.*\n', '', s)
+s = s[s.index('"coop"'):]
+s = s[s.index('"1"'):]
+s = s[s.index('"map"')+5:]
+a = s.index('"') + 1
+b = s.index('"', a)
+
+print(s[a:b])
+

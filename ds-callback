@@ -1,0 +1,23 @@
+#!/bin/bash
+
+event="$1"
+fullpath="$2"
+filepath=$(dirname "$fullpath")
+filename=$(basename "$fullpath")
+
+if [[ "$filename" == @未读*  ]]; then
+    exit
+fi
+
+case $event in
+    IN_CLOSE_WRITE)
+        touch "$filepath/@未读-$filename"
+        ;;
+    IN_CLOSE_NOWRITE)
+        rm -f "$filepath/@未读-$filename"
+        ;;
+    IN_ISDIR,IN_CLOSE_NOWRITE)
+        exit
+        ;;
+esac
+

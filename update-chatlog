@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SUFFIX=$(date '+%y%m%d')
+BASEDIR=/home/yxnan/site/misc
+TARGET_1=$BASEDIR/chat/1-$SUFFIX.txt
+TARGET_2=$BASEDIR/chat/2-$SUFFIX.txt
+TARGET_3=$BASEDIR/chat/3-$SUFFIX.txt
+
+ln -sf $TARGET_1 $BASEDIR/chatlog_1.txt
+ln -sf $TARGET_2 $BASEDIR/chatlog_2.txt
+ln -sf $TARGET_3 $BASEDIR/chatlog_3.txt
+

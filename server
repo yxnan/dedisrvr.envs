@@ -1,0 +1,8 @@
+#!/bin/bash
+
+while :
+do
+	~/steam/l4d2/srcds_run -console -game left4dead2 -port 27015 +map c2m1_highway +log off +servercfgfile "server1.cfg" -insecure #-nomaster
+	echo -e "Hit Ctrl+C in 3 seconds to prevent restart\n"
+	sleep 3
+done

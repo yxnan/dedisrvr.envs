@@ -1,0 +1,99 @@
+#!/bin/bash
+
+ADDONS=~/steam/l4d2/left4dead2/addons
+log_file=~/watch_log.txt
+log_file_pub=~/site/misc/watch_log.txt
+
+logwrite() {
+    echo "[`date +%m/%d/%y-%H:%M:%S`] $1" >> $log_file
+    iconv -f utf8 -t gbk $log_file > $log_file_pub
+    #cp $log_file $log_file_pub
+}
+
+log_final() {
+    echo >> $log_file
+    iconv -f utf8 -t gbk $log_file > $log_file_pub
+    #cp $log_file $log_file_pub
+}
+
+fullpath="$1"
+filename=$(basename "$fullpath")
+# 检查不合法上传
+if ! [[ "$filename" =~ vpk|zip|rar|7z|restart ]]; then
+    rm -rf "$fullpath"
+    exit
+fi
+
+# 处理重启服务器指令
+if [ "$filename" == "restart" ]; then
+    screen -S l4d2 -X stuff "quit^M"  # 重启服务器
+    logwrite "服务器重启"
+    rm -rf "$fullpath"
+    log_final && exit
+fi 
+
+
+# 处理地图上传
+VPK=~/.local/bin/vpk
+UNVPK=~/.local/bin/unvpk
+GETMAPCMD=~/getmapcmd
+GETMAPNAME=~/getmapname
+
+# 精简vpk文件，取得建图代码，并安装
+process_vpk () {
+    vpk_tmp=$(mktemp -d -t vpk-XXXX)
+    vpk_name="$(basename "$1")"
+    vpk_dist="$ADDONS/$vpk_name"
+
+    # vpk 解包有很小几率编码错误，使用 unvpk
+    unvpk_result=$($UNVPK -C $vpk_tmp "$1" | tail -1)
+    logwrite "unvpk: $unvpk_result"
+
+    cd $vpk_tmp && mv ' '/* .
+    shopt -s extglob
+    eval 'rm -rf !(maps|modes|missions|models|scripts|addoninfo.txt)'
+    if [ -e modes ]; then
+        vpk_type="变异模式"
+        vpk_info="，模式名：$(t=$(basename $(ls modes/!(gamemodes.txt)));echo ${t%.*})"
+    elif [ -e missions ]; then
+        vpk_type="地图"
+        vpk_info="，名称：$(ls missions/* | $GETMAPNAME)，建图代码：$(ls missions/* | $GETMAPCMD)"
+    else
+        vpk_type="支持包"
+        vpk_info=""
+    fi
+
+    $VPK -c $vpk_tmp "$vpk_dist" && cd -
+
+    if [ -e "$vpk_dist" ]; then
+        vpk_size="$(ls -lh "$vpk_dist" | tr -s ' ' | cut -d' ' -f5)"
+        logwrite "$vpk_type已安装，大小：$vpk_size$vpk_info"
+    else
+        logwrite "VPK安装失败，请联系管理员解决"
+    fi
+
+    rm -rf $vpk_tmp
+}
+
+unar_tmp=$(mktemp -d -t unar-XXXX)
+logwrite "收到文件：$filename"
+
+if [ ${filename: -3} == "vpk" ]; then
+    process_vpk "$fullpath"
+elif unar -o $unar_tmp "$fullpath"; then
+    rm -rf "$fullpath"
+
+    find $unar_tmp -name '*.vpk' | while read vpk_file
+    do
+        logwrite "成功解压：$(basename "$vpk_file")"
+        process_vpk "$vpk_file"
+    done
+else
+    logwrite "试图解压失败，放弃文件"
+fi
+
+rm -rf $unar_tmp "$fullpath"
+
+avail_space=$(df -h --output=avail /dev/vda1 | tail -1 | sed 's/ //g')
+logwrite "服务器剩余空间：$avail_space"
+log_final

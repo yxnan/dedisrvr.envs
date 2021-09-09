@@ -1,0 +1,7 @@
+#!/bin/bash
+
+${HOME}/steam/steamcmd.sh \
+    +login anonymous \
+    +force_install_dir ${HOME}/steam/l4d2 \
+    +app_update 222860 \
+    +quit

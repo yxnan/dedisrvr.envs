@@ -1,0 +1,17 @@
+#!/bin/bash
+
+SRC_ROOT="$HOME/steam/l4d2/left4dead2"
+DST="$HOME/backup"
+LOGFILE="$DST/CHANGELOG"
+IDENTIFIER=$(date +%y%m%d)
+
+rm -rf "$DST/$IDENTIFIER"
+mkdir -p "$DST/$IDENTIFIER"
+7za a "$DST/$IDENTIFIER/cfg.7z" "$SRC_ROOT/cfg"
+7za a "$DST/$IDENTIFIER/addons.7z" "$SRC_ROOT/addons/sourcemod" "$SRC_ROOT/addons/metamod*" "$SRC_ROOT/addons/l4dtoolz" "$SRC_ROOT/addons/tickrate_enabler*" "$SRC_ROOT/addons/stripper"
+7za a "$DST/$IDENTIFIER/ems.7z" "$SRC_ROOT/ems"
+7za a "$DST/$IDENTIFIER/missions.cache.7z" "$SRC_ROOT/missions.cache"
+7za a "$DST/$IDENTIFIER/scripts.vscripts.7z" "$SRC_ROOT/scripts/vscripts"
+
+echo $IDENTIFIER >> $LOGFILE
+vim $LOGFILE

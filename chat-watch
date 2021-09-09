@@ -1,0 +1,4 @@
+#!/bin/bash
+
+#screen -dm -S chat iwatch -e close_write -c "iconv -f utf8 -t gbk//IGNORE %f > ~/site/misc/chatlog.txt" ~/site/misc/chat
+screen -dm -S chat iwatch -e close_write -c "~/link-chatlog %f" ~/site/misc/chat
