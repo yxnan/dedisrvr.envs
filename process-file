@@ -1,7 +1,7 @@
 #!/bin/bash
 
-ADDONS=~/steam/l4d2/left4dead2/addons
-log_file=~/watch_log.txt
+ADDONS=~/Steam/l4d2/left4dead2/addons
+log_file=~/uploads.txt
 log_file_pub=~/site/misc/uploads.txt
 log_file_pub_utf8=~/site/misc/uploads_utf8.txt
 
@@ -13,26 +13,15 @@ logwrite() {
 
 log_final() {
     echo >> $log_file
-    iconv -f utf8 -t gbk $log_file > $log_file_pub
-    #cp $log_file $log_file_pub
 }
 
 fullpath="$1"
 filename=$(basename "$fullpath")
 # 检查不合法上传
-if ! [[ "$filename" =~ vpk|zip|rar|7z|restart ]]; then
+if ! [[ "$filename" =~ vpk|zip|rar|7z|tar|xz ]]; then
     rm -rf "$fullpath"
     exit
 fi
-
-# 处理重启服务器指令
-if [ "$filename" == "restart" ]; then
-    screen -S l4d2 -X stuff "quit^M"  # 重启服务器
-    logwrite "服务器重启"
-    rm -rf "$fullpath"
-    log_final && exit
-fi 
-
 
 # 处理地图上传
 VPK=~/.local/bin/vpk
@@ -49,10 +38,27 @@ process_vpk () {
     # vpk 解包有很小几率编码错误，使用 unvpk
     unvpk_result=$($UNVPK -C $vpk_tmp "$1" | tail -1)
     logwrite "unvpk: $unvpk_result"
+    if [[ "0" != $(echo $unvpk_result | awk '{print $(NF-1)}') ]]; then
+        logwrite "UNVPK失败（无效的vpk文件）"
+        rm -rf $vpk_tmp
+        return
+    fi
 
+    # 移动至解包临时目录（非常重要，下面操作都以此为相对路径）
     cd $vpk_tmp && mv ' '/* .
+
+    # 粗略清理：particles|materials|sound 等等
     shopt -s extglob
     eval 'rm -rf !(maps|modes|missions|models|scripts|addoninfo.txt)'
+
+    # 清理模型顶点/网格等文件
+    find models \( -name "*.vvd" -o -name "*.vtx" \) -exec rm {} +
+
+    # 监视有用文件
+    if [[ ! -z $(find . -name "*.vmf" -print0 | tee >(xargs -0 -I {} mv {} ~/workdir)) ]]; then
+        logwrite "发现VMF文件，已移至备份文件夹"
+    fi
+
     if [ -e modes ]; then
         vpk_type="变异模式"
         vpk_info="，模式名：$(t=$(basename $(ls modes/!(gamemodes.txt)));echo ${t%.*})"

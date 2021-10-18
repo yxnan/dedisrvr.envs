@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SRC_ROOT="$HOME/steam/l4d2/left4dead2"
+SRC_ROOT="$HOME/Steam/l4d2/left4dead2"
 DST="$HOME/backup"
 LOGFILE="$DST/CHANGELOG"
 IDENTIFIER=$(date +%y%m%d)
