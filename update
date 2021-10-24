@@ -5,3 +5,9 @@ ${HOME}/Steam/steamcmd.sh \
     +force_install_dir ${HOME}/Steam/l4d2 \
     +app_update 222860 \
     +quit
+
+# https://github.com/typowritter/py-str0patch
+cd ${HOME}/py-str0patch || exit
+./str0.py -c str0-l4d2.ini -p patchlist
+./str0.py -c str0-l4d2-ext.ini -p patchlist-ext
+

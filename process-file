@@ -47,9 +47,9 @@ process_vpk () {
     # 移动至解包临时目录（非常重要，下面操作都以此为相对路径）
     cd $vpk_tmp && mv ' '/* .
 
-    # 粗略清理：particles|materials|sound 等等
+    # 粗略清理：materials|sound 等等
     shopt -s extglob
-    eval 'rm -rf !(maps|modes|missions|models|scripts|addoninfo.txt)'
+    eval 'rm -rf !(maps|modes|missions|models|scripts|particles|scenes|addoninfo.txt)'
 
     # 清理模型顶点/网格等文件
     find models \( -name "*.vvd" -o -name "*.vtx" \) -exec rm {} +
