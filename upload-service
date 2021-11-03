@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd ~/site/upload
+ln -sf index.html.$1 index.html
+echo $1 > flag
+
